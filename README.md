@@ -92,6 +92,7 @@ Códigos HTTP que disparam retry: erros de rede (`≤ 0`), `429 Too Many Request
 
 <div align="center">
 <sup>Figura 1 - Diagrama de conexões</sup>
+<br>
 
 <img src="diagram.png">
 
