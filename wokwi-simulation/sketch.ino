@@ -2,20 +2,23 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <time.h>
 
 const char* SSID     = "Wokwi-GUEST";
 const char* PASSWORD = "";
 const char* API_URL  = "http://unrevolving-lauren-nonpermeable.ngrok-free.dev/sensorData";
 
-// Sensor de temperatura
 const char* SENSOR_ID_TEMP   = "SN-TH-001";
 const char* SENSOR_TYPE_TEMP = "temperatura";
 const char* READ_TYPE_TEMP   = "analog";
 
-// Sensor de presença
 const char* SENSOR_ID_PIR   = "SN-PIR-001";
 const char* SENSOR_TYPE_PIR = "presença";
 const char* READ_TYPE_PIR   = "discrete";
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = -3 * 3600;
+const int   daylightOffset_sec = 0;
 
 #define SENSOR_PIN     A0
 #define PIR_PIN        15
@@ -39,13 +42,40 @@ void setup() {
 
   if (WiFi.status() == WL_CONNECTED) {
     Serial1.println("\nConectado! IP: " + WiFi.localIP().toString());
+    configTime(10, gmtOffset_sec, ntpServer, "time.nist.gov");
   } else {
     Serial1.println("\nFalha na conexão Wi-Fi");
   }
+
+  Serial1.println("Sincronizando NTP");
+  time_t now = time(nullptr);
+  int i = 0;
+
+  while (now < 1000000000 && i < 20) { 
+    delay(500);
+    now = time(nullptr);
+    i++;
+  }
+
+  if (now < 1000000000) {
+    Serial1.println("\nFalha ao sincronizar NTP");
+  } else {
+    Serial1.println("\nNTP sincronizado!");
+  }
+
 }
 
 String getTimestamp() {
-  return "2024-06-01T12:00:00Z";
+  time_t now = time(nullptr);
+  struct tm* timeinfo = localtime(&now);
+
+  if (timeinfo == nullptr) {
+    return "1970-01-01T00:00:00";
+  }
+
+  char buf[20];
+  strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", timeinfo);
+  return String(buf) + "-03:00";
 }
 
 float lerTemperatura() {
@@ -145,6 +175,4 @@ void loop() {
   Serial1.printf("Presença detectada: %s\n", presenca ? "SIM" : "NÃO");
   bool okPir = enviarDadosPresenca(presenca);
   Serial1.println(okPir ? "Presença enviada com sucesso!" : "Falha no envio da presença");
-
-  delay(30000);
 }
