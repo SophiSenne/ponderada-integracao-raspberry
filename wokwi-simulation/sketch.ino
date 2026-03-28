@@ -3,10 +3,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <time.h>
-
-const char* SSID     = "Wokwi-GUEST";
-const char* PASSWORD = "";
-const char* API_URL  = "http://unrevolving-lauren-nonpermeable.ngrok-free.dev/sensorData";
+#include "config.h"
 
 const char* SENSOR_ID_TEMP   = "SN-TH-001";
 const char* SENSOR_TYPE_TEMP = "temperatura";
