@@ -90,6 +90,15 @@ Códigos HTTP que disparam retry: erros de rede (`≤ 0`), `429 Too Many Request
 
 ## Conexões
 
+<div align="center">
+<sup>Figura 1 - Diagrama de conexões</sup>
+
+<img src="diagram.png">
+
+<sup>Print da tela do Wokwi</sup>
+</div>
+
+
 | Sinal | Pico W | Sensor |
 |---|---|---|
 | VCC Temperatura | 3V3 | NTC VCC |
