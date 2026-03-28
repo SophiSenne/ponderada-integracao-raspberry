@@ -8,20 +8,28 @@ const char* SSID     = "Wokwi-GUEST";
 const char* PASSWORD = "";
 const char* API_URL  = "http://unrevolving-lauren-nonpermeable.ngrok-free.dev/sensorData";
 
+// Sensor de temperatura
 const char* SENSOR_ID_TEMP   = "SN-TH-001";
 const char* SENSOR_TYPE_TEMP = "temperatura";
 const char* READ_TYPE_TEMP   = "analog";
 
+// Sensor de presença
 const char* SENSOR_ID_PIR   = "SN-PIR-001";
 const char* SENSOR_TYPE_PIR = "presença";
 const char* READ_TYPE_PIR   = "discrete";
 
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = -3 * 3600;
+const long  gmtOffset_sec = -3 * 3600; // UTC-3 (Brasília)
 const int   daylightOffset_sec = 0;
 
 #define SENSOR_PIN     A0
 #define PIR_PIN        15
+
+#define PIR_DEBOUNCE_MS 50
+
+bool     pirLastStable   = false;
+bool     pirLastRaw      = false;
+uint32_t pirLastChangeMs = 0; 
 
 void setup() {
   Serial1.begin(115200);
@@ -86,7 +94,19 @@ float lerTemperatura() {
 }
 
 bool lerPresenca() {
-  return digitalRead(PIR_PIN) == HIGH;
+  bool rawNow = (digitalRead(PIR_PIN) == HIGH);
+  uint32_t now = millis();
+
+  if (rawNow != pirLastRaw) {
+    pirLastRaw      = rawNow;
+    pirLastChangeMs = now;
+  }
+
+  if ((now - pirLastChangeMs) >= PIR_DEBOUNCE_MS) {
+    pirLastStable = pirLastRaw;
+  }
+
+  return pirLastStable;
 }
 
 bool enviarDadosTemperatura(float valor) {
