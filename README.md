@@ -161,6 +161,7 @@ Este projeto foi desenvolvido utilizando o simulador **[Wokwi](https://wokwi.com
 
 ## Evidências de Funcionamento
 
+🎥 [Assista à demonstração](https://docs.google.com/videos/d/1D0hbsCV3fcAFOMVK6ALaa99fmzmblRCQTKZVTQeR2Og/edit?usp=sharing)
 
 ## Referência ao Backend — Atividade Anterior
 
