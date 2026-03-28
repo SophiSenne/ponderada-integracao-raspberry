@@ -1,6 +1,6 @@
 # Firmware Embarcado — Raspberry Pi Pico W com Sensores NTC e PIR
 
-> **Atividade Ponderada 2** — Integração com Raspberry Pi Pico W  
+> **Atividade Ponderada 3** — Integração com Raspberry Pi Pico W  
 
 ## Visão Geral
 
