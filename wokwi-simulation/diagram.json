@@ -3,25 +3,17 @@
   "author": "Sophia Silva",
   "editor": "wokwi",
   "parts": [
-    {
-      "type": "board-pi-pico-w",
-      "id": "pico",
-      "top": 0,
-      "left": 0,
-      "attrs": {}
-    },
-    {
-      "type": "wokwi-ntc-temperature-sensor",
-      "id": "ntc1",
-      "top": 50,
-      "left": -180,
-      "attrs": {}
-    }
+    { "type": "board-pi-pico-w", "id": "pico", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-ntc-temperature-sensor", "id": "ntc1", "top": 50, "left": -180, "attrs": {} },
+    { "type": "wokwi-pir-motion-sensor", "id": "pir1", "top": 4, "left": 155.82, "attrs": {} }
   ],
   "connections": [
-    [ "ntc1:VCC", "pico:3V3",    "red",   [] ],
-    [ "ntc1:GND", "pico:GND",    "black", [] ],
-    [ "ntc1:OUT", "pico:GP26",   "green", [] ],
+    [ "ntc1:VCC", "pico:3V3", "red", [] ],
+    [ "ntc1:GND", "pico:GND", "black", [] ],
+    [ "ntc1:OUT", "pico:GP26", "green", [] ],
+    [ "pir1:VCC", "pico:3V3", "red", [] ],
+    [ "pir1:GND", "pico:GND", "black", [] ],
+    [ "pir1:OUT", "pico:GP15", "yellow", [] ],
     [ "pico:GP0", "$serialMonitor:RX", "", [] ],
     [ "pico:GP1", "$serialMonitor:TX", "", [] ]
   ],
