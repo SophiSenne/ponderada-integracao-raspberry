@@ -8,24 +8,31 @@ const char* SSID     = "Wokwi-GUEST";
 const char* PASSWORD = "";
 const char* API_URL  = "http://unrevolving-lauren-nonpermeable.ngrok-free.dev/sensorData";
 
-// Sensor de temperatura
 const char* SENSOR_ID_TEMP   = "SN-TH-001";
 const char* SENSOR_TYPE_TEMP = "temperatura";
 const char* READ_TYPE_TEMP   = "analog";
 
-// Sensor de presença
 const char* SENSOR_ID_PIR   = "SN-PIR-001";
 const char* SENSOR_TYPE_PIR = "presença";
 const char* READ_TYPE_PIR   = "discrete";
 
 const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = -3 * 3600; // UTC-3 (Brasília)
+const long  gmtOffset_sec = -3 * 3600;
 const int   daylightOffset_sec = 0;
 
 #define SENSOR_PIN     A0
 #define PIR_PIN        15
 
 #define PIR_DEBOUNCE_MS 50
+
+#define TEMP_CAL_RAW_LOW   110        
+#define TEMP_CAL_RAW_HIGH  955      
+#define TEMP_CAL_REF_HIGH  100.0f   
+#define TEMP_MIN_VALID    -10.0f
+#define TEMP_WINDOW_SIZE   8        
+static float tempBuffer[TEMP_WINDOW_SIZE] = {};
+static uint8_t tempBufIdx = 0;
+static uint8_t tempBufCount = 0;
 
 bool     pirLastStable   = false;
 bool     pirLastRaw      = false;
@@ -88,9 +95,30 @@ String getTimestamp() {
 
 float lerTemperatura() {
   int raw = analogRead(SENSOR_PIN);
-  float voltage = raw * (3.3f / 1023.0f);
-  float temperatura = (voltage - 0.5f) * 100.0f;
-  return temperatura;
+
+  float tempRaw = -0.125f * raw + 88.5f;
+  Serial1.printf("[TEMP] (raw=%d, calc=%.1f)\n", raw, tempRaw);
+
+  if (tempRaw < TEMP_MIN_VALID || tempRaw > TEMP_MAX_VALID) {
+    Serial1.printf("[TEMP] Amostra descartada (raw=%d, calc=%.1f)\n", raw, tempRaw);
+    if (tempBufCount == 0) return 0.0f;
+    float sum = 0;
+    for (uint8_t i = 0; i < tempBufCount; i++) sum += tempBuffer[i];
+    return sum / tempBufCount;
+  }
+
+  tempBuffer[tempBufIdx] = tempRaw;
+  tempBufIdx = (tempBufIdx + 1) % TEMP_WINDOW_SIZE;
+  if (tempBufCount < TEMP_WINDOW_SIZE) tempBufCount++;
+
+  float sum = 0;
+  for (uint8_t i = 0; i < tempBufCount; i++) sum += tempBuffer[i];
+  float media = sum / tempBufCount;
+
+  if (media < TEMP_MIN_VALID) media = TEMP_MIN_VALID;
+  if (media > TEMP_MAX_VALID) media = TEMP_MAX_VALID;
+
+  return media;
 }
 
 bool lerPresenca() {
